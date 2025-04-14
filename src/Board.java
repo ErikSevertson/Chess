@@ -4,7 +4,7 @@ public class Board {
 	public static boolean isPieceInHand = false;
 	public static int[] previousLocation = new int[2];
 	public static int piecePickedUp = 0;
-	public static boolean WhiteToMove = true;
+	public static boolean whiteToMove = true;
 	
 	public static int lastPieceMoved = 0;
 	public static int lastRankMovedTo = 0;
@@ -44,11 +44,11 @@ public class Board {
 	
 	public static void pickPieceUp() {
 		
-		int index_x = (int) (GameDriver.mouseLocation()[0] / GameDriver.TILE_WIDTH);
-		int index_y = (int) (GameDriver.mouseLocation()[1] / GameDriver.TILE_WIDTH);
+		int index_y = (int) (GameDriver.mouseLocation()[0] / GameDriver.TILE_WIDTH);
+		int index_x = (int) (GameDriver.mouseLocation()[1] / GameDriver.TILE_WIDTH);
 		int pieceClicked = gameState[index_y][index_x];
 		//clicked on a piece
-		if (WhiteToMove) {
+		if (whiteToMove) {
 			if (pieceClicked > 6) {
 				piecePickedUp = pieceClicked;
 				previousLocation[0] = index_y;
@@ -67,19 +67,20 @@ public class Board {
 	}
 	
 	public static void placePiece () {
-		int index_x = (int) (GameDriver.mouseLocation()[0] / GameDriver.TILE_WIDTH);
-		int index_y = (int) (GameDriver.mouseLocation()[1] / GameDriver.TILE_WIDTH);
+		int index_y = (int) (GameDriver.mouseLocation()[0] / GameDriver.TILE_WIDTH);
+		int index_x = (int) (GameDriver.mouseLocation()[1] / GameDriver.TILE_WIDTH);
+		
 		
 		boolean isCastling = Piece.isCastling(piecePickedUp, previousLocation[1], previousLocation[0], index_x, index_y);
 		if (isCastling) {
 			isPieceInHand = false;
-			WhiteToMove = !WhiteToMove;
+			whiteToMove = !whiteToMove;
 			return;
 		}
 		
 		boolean validMove = Piece.isValidMove(piecePickedUp, previousLocation[1], previousLocation[0], index_x, index_y, true);
 		//move would put king in check
-		if (Board.wouldKingBeInCheck(gameState, WhiteToMove, previousLocation[1], previousLocation[0], index_x, index_y)) {
+		if (Board.wouldKingBeInCheck(gameState, whiteToMove, previousLocation[1], previousLocation[0], index_x, index_y)) {
 			validMove = false;
 		}
 		
@@ -133,7 +134,7 @@ public class Board {
 //			System.out.println("piece picked up was " + piecePickedUp + " and previous location was " + previousLocation[0] + previousLocation[1]);
 			gameState[previousLocation[0]][previousLocation[1]] = 0;
 			isPieceInHand = false;	
-			WhiteToMove = !WhiteToMove;
+			whiteToMove = !whiteToMove;
 			
 			
 			if (lastPieceMoved == 6 && lastFileMovedFrom == 7) {
@@ -206,16 +207,16 @@ public class Board {
 		return previousLocation[0];
 	}
 	
-	public static boolean wouldKingBeInCheck(int[][] gameState, boolean WhiteToMove, int oldX, int oldY, int newX, int newY) {
+	public static boolean wouldKingBeInCheck(int[][] gameState, boolean whiteToMove, int oldX, int oldY, int newX, int newY) {
 		int originalPiece = gameState[newY][newX];
 		int movingPiece = gameState[oldY][oldX];
 		// Simulate the move
 	    gameState[newY][newX] = movingPiece;
 	    gameState[oldY][oldX] = 0;
 	    
-	    int kingX = getKingX(gameState, WhiteToMove);
-	    int kingY = getKingY(gameState, WhiteToMove);
-		boolean isInCheck = Piece.isSquareControlled(WhiteToMove, kingY, kingX);
+	    int kingX = getKingX(gameState, whiteToMove);
+	    int kingY = getKingY(gameState, whiteToMove);
+		boolean isInCheck = Piece.isSquareControlled(whiteToMove, kingY, kingX);
 		// Revert the simulated move
 	    gameState[newY][newX] = originalPiece;
 	    gameState[oldY][oldX] = movingPiece;
@@ -223,12 +224,12 @@ public class Board {
 	}
 	
 	public static void checkForMate() {
-		if (Piece.isSquareControlled(WhiteToMove, getKingY(gameState, WhiteToMove), getKingX(gameState, WhiteToMove))) {
+		if (Piece.isSquareControlled(whiteToMove, getKingY(gameState, whiteToMove), getKingX(gameState, whiteToMove))) {
 			if (Piece.returnNumberOfMoves(gameState) == 0) System.out.println("holy mackarel that's a checkmate");	
 		}
 	}
 	public static void checkForStalemate() {
-		if (!Piece.isSquareControlled(WhiteToMove, getKingY(gameState, WhiteToMove), getKingX(gameState, WhiteToMove))) {
+		if (!Piece.isSquareControlled(whiteToMove, getKingY(gameState, whiteToMove), getKingX(gameState, whiteToMove))) {
 			if (Piece.returnNumberOfMoves(gameState) == 0) System.out.println("holy mackarel that's a stalemate");	
 		}
 	}

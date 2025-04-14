@@ -8,30 +8,22 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
+
 @SuppressWarnings("serial")
-public class GameDriver extends JPanel implements MouseListener{
-	
+public class GameDriver extends JPanel implements MouseListener {
+
 	public static final int TILE_WIDTH = 80;
 	public static final int X_LENGTH = 8 * TILE_WIDTH + 15;
 	public static final int Y_LENGTH = 8 * TILE_WIDTH;
-	
+
 	private static Image[] pieces = new Image[13];
-	
+
 	private static GameDriver board;
-	
+
 	public static void main(String[] args) {
 		init_board();
-		while(true) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			board.repaint();
-		}
 	}
-	
-	
+
 	public static void init_board() {
 		board = new GameDriver();
 		JFrame frame = new JFrame();
@@ -41,8 +33,20 @@ public class GameDriver extends JPanel implements MouseListener{
 		frame.setSize(X_LENGTH, Y_LENGTH + 37); // 37 to account for bottom border width
 		frame.setVisible(true);
 		frame.setResizable(false);
+
+		new Thread(() -> {
+			while (true) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				board.repaint(); // triggers paintComponent
+			}
+		}).start();
 	}
-	
+
+
 	public GameDriver() {
 		addMouseListener(this);
 		File dir = new File("C:\\Users\\erik2\\eclipse-workspace\\ChessGame\\images");
@@ -56,7 +60,7 @@ public class GameDriver extends JPanel implements MouseListener{
 			pieces[i] = pieces[i].getScaledInstance(TILE_WIDTH, TILE_WIDTH, Image.SCALE_SMOOTH);
 		}
 	}
-	
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		// draws the game board empty
@@ -82,35 +86,34 @@ public class GameDriver extends JPanel implements MouseListener{
 			}
 		}
 
-		//draws piece in hand
+		// draws piece in hand
 		if (Board.isPieceInHand == true) {
-			g.drawImage(pieces[Board.piecePickedUp], mouseLocation()[0] - (TILE_WIDTH / 2), mouseLocation()[1] - (TILE_WIDTH / 2), this);
-			
+			g.drawImage(pieces[Board.piecePickedUp], mouseLocation()[1] - (TILE_WIDTH / 2),
+					mouseLocation()[0] - (TILE_WIDTH / 2), this);
+
 		}
 	}
-	
+
 	// gets mouse location on call
 	public static int[] mouseLocation() {
 		int[] coords = new int[2];
 		int x_pos = (int) (MouseInfo.getPointerInfo().getLocation().getX() - board.getLocationOnScreen().getX());
 		int y_pos = (int) (MouseInfo.getPointerInfo().getLocation().getY() - board.getLocationOnScreen().getY());
-		coords[0] = x_pos;
-		coords[1] = y_pos;
+		coords[0] = y_pos;
+		coords[1] = x_pos;
 		return coords;
 	}
-	
-	
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// intentionally empty method required for the interface
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {	
+	public void mousePressed(MouseEvent e) {
 		if (Board.isPieceInHand) {
 			Board.placePiece();
-		}
-		else {
+		} else {
 			Board.pickPieceUp();
 		}
 	}
@@ -127,6 +130,6 @@ public class GameDriver extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// intentionally empty method required for the interface	
+		// intentionally empty method required for the interface
 	}
 }

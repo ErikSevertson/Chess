@@ -14,14 +14,13 @@ public class Piece {
 	public static boolean enPassantingOnRight = false;
 
 	public static boolean isValidMove(int piece, int old_x, int old_y, int new_x, int new_y, boolean actuallyMoving) {
-
+		// no move made
+		if (old_x == new_x && old_y == new_y) {
+			return false;
+		}
 		// attempting to capture own piece
 		if ((piece > 6 && Board.gameState[new_y][new_x] > 6)
 				|| (piece < 7 && (Board.gameState[new_y][new_x] < 7) && Board.gameState[new_y][new_x] > 0)) {
-			return false;
-		}
-
-		if (old_x == new_x && old_y == new_y) {
 			return false;
 		}
 
@@ -252,7 +251,7 @@ public class Piece {
 
 	public static boolean isKingMoveValid(int piece, int old_x, int old_y, int new_x, int new_y, boolean actuallyMoving) {
 		if (Math.abs(old_x - new_x) < 2 && Math.abs(old_y - new_y) < 2) {
-			if (Board.WhiteToMove) {
+			if (Board.whiteToMove) {
 				if (actuallyMoving) whiteKingHasMoved = true;
 			} else {
 				if (actuallyMoving) blackKingHasMoved = true;
@@ -265,7 +264,7 @@ public class Piece {
 
 	public static boolean isCastling(int piece, int old_x, int old_y, int new_x, int new_y) {
 		// white short side castling
-		if (Board.WhiteToMove && new_y == 7 && new_x == 6 && piece == 8 && !rightWhiteRookMoved && !whiteKingHasMoved
+		if (Board.whiteToMove && new_y == 7 && new_x == 6 && piece == 8 && !rightWhiteRookMoved && !whiteKingHasMoved
 				&& Board.gameState[7][5] == 0 && Board.gameState[7][6] == 0) {
 			Board.gameState[7][6] = 8;
 			Board.gameState[7][5] = 12;
@@ -274,7 +273,7 @@ public class Piece {
 			return true;
 		}
 		// white long side castling
-		else if (Board.WhiteToMove && new_y == 7 && new_x == 2 && piece == 8 && !leftWhiteRookMoved
+		else if (Board.whiteToMove && new_y == 7 && new_x == 2 && piece == 8 && !leftWhiteRookMoved
 				&& !whiteKingHasMoved && Board.gameState[7][1] == 0 && Board.gameState[7][2] == 0
 				&& Board.gameState[7][3] == 0) {
 			Board.gameState[7][2] = 8;
@@ -284,7 +283,7 @@ public class Piece {
 			return true;
 		}
 		// black short side castling
-		else if (!Board.WhiteToMove && new_y == 0 && new_x == 6 && piece == 2 && !leftBlackRookMoved
+		else if (!Board.whiteToMove && new_y == 0 && new_x == 6 && piece == 2 && !leftBlackRookMoved
 				&& !blackKingHasMoved && Board.gameState[0][6] == 0 && Board.gameState[0][5] == 0) {
 			Board.gameState[0][6] = 2;
 			Board.gameState[0][5] = 6;
@@ -293,7 +292,7 @@ public class Piece {
 			return true;
 		}
 		// black long side castling
-		else if (!Board.WhiteToMove && new_y == 0 && new_x == 2 && piece == 2 && !rightBlackRookMoved
+		else if (!Board.whiteToMove && new_y == 0 && new_x == 2 && piece == 2 && !rightBlackRookMoved
 				&& !blackKingHasMoved && Board.gameState[0][1] == 0 && Board.gameState[0][2] == 0
 				&& Board.gameState[0][3] == 0) {
 			Board.gameState[0][2] = 2;
@@ -305,16 +304,16 @@ public class Piece {
 		return false;
 	}
 
-	public static boolean isSquareControlled(boolean WhiteToMove, int y, int x) {
+	public static boolean isSquareControlled(boolean whiteToMove, int y, int x) {
 		for (int i = 0; i < 8; ++i) {
 			for (int j = 0; j < 8; ++j) {
-				if (WhiteToMove) {
+				if (whiteToMove) {
 					if (Board.gameState[i][j] < 7 && Board.gameState[i][j] > 0) { // black piece
 						boolean isInCheck = isValidMove(Board.gameState[i][j], j, i, x, y, false);
 						if (isInCheck)
 							return true;
 					}
-				} else if (!WhiteToMove) {
+				} else if (!whiteToMove) {
 					if (Board.gameState[i][j] > 6) { // white piece
 						boolean isInCheck = isValidMove(Board.gameState[i][j], j, i, x, y, false);
 						if (isInCheck)
@@ -331,7 +330,7 @@ public class Piece {
 		int moveCounter = 0;
 		for (int i = 0; i < 8; ++i) {
 			for (int j = 0; j < 8; ++j) {
-				if (Board.WhiteToMove && gameState[i][j] > 6) {
+				if (Board.whiteToMove && gameState[i][j] > 6) {
 					for (int x = 0; x < 8; x++) {
 						for (int y = 0; y < 8; y++) {
 							if (gameState[y][x] > 6) {
@@ -345,7 +344,7 @@ public class Piece {
 						}
 					}
 
-				} else if (!Board.WhiteToMove) {
+				} else if (!Board.whiteToMove) {
 
 				}
 			}
@@ -359,13 +358,13 @@ public class Piece {
 		for (int i = 0; i < 8; ++i) {
 			for (int j = 0; j < 8; ++j) {
 				
-				if (Board.WhiteToMove && gameState[i][j] > 6) {
+				if (Board.whiteToMove && gameState[i][j] > 6) {
 					for (int x = 0; x < 8; x++) {
 						for (int y = 0; y < 8; y++) {
 							if (gameState[y][x] > 6) {
 								continue;
 							}
-							if (!Board.wouldKingBeInCheck(gameState, Board.WhiteToMove, j, i, x, y)) {
+							if (!Board.wouldKingBeInCheck(gameState, Board.whiteToMove, j, i, x, y)) {
 								if (isValidMove(gameState[i][j], j, i, x, y, false)) {
 									
 									moveCounter++;
@@ -376,13 +375,13 @@ public class Piece {
 						}
 					}
 
-				} else if (!Board.WhiteToMove && gameState[i][j] < 7 && gameState[i][j] > 0) {
+				} else if (!Board.whiteToMove && gameState[i][j] < 7 && gameState[i][j] > 0) {
 					for (int x = 0; x < 8; x++) {
 						for (int y = 0; y < 8; y++) {
 							if (gameState[y][x] < 7 && gameState[y][x] > 0) {
 								continue;
 							}
-							if (!Board.wouldKingBeInCheck(gameState, Board.WhiteToMove, j, i, x, y)) {		
+							if (!Board.wouldKingBeInCheck(gameState, Board.whiteToMove, j, i, x, y)) {		
 								if (isValidMove(gameState[i][j], j, i, x, y, false)) {
 									moveCounter++;
 
