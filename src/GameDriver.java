@@ -18,13 +18,18 @@ public class GameDriver extends JPanel implements MouseListener {
 
 	private static Image[] pieces = new Image[13];
 
-	private static GameDriver board;
+	public static GameDriver board;
+
+	private static String gameType = "";
+
+	private static boolean isPlayerTurn = true;
 
 	public static void main(String[] args) {
-		init_board();
+		init_board("TwoPlayer");
 	}
 
-	public static void init_board() {
+	public static void init_board(String playerOrComputer) {
+		gameType = playerOrComputer;
 		board = new GameDriver();
 		JFrame frame = new JFrame();
 		frame.add(board);
@@ -34,16 +39,32 @@ public class GameDriver extends JPanel implements MouseListener {
 		frame.setVisible(true);
 		frame.setResizable(false);
 
-		new Thread(() -> {
-			while (true) {
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+		if (gameType == "TwoPlayer") {
+
+			new Thread(() -> {
+				while (true) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					board.repaint(); // triggers paintComponent
 				}
-				board.repaint(); // triggers paintComponent
-			}
-		}).start();
+			}).start();
+		}
+
+		if (gameType == "Computer") {
+			new Thread(() -> {
+				while (true) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					board.repaint(); // triggers paintComponent
+				}
+			}).start();
+		}
 	}
 
 
@@ -111,11 +132,26 @@ public class GameDriver extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (Board.isPieceInHand) {
-			Board.placePiece();
-		} else {
-			Board.pickPieceUp();
+		if (gameType == "TwoPlayer") {
+			if (Board.isPieceInHand) {
+				Board.placePiece();
+			} else {
+				Board.pickPieceUp();
+			}
 		}
+
+		else if (gameType == "Computer") {
+			if (isPlayerTurn) {
+				if (Board.isPieceInHand) {
+					Board.placePiece();
+					isPlayerTurn = false;
+					// make computer move here !!!!!!
+				} else {
+					Board.pickPieceUp();
+				}
+			}
+		}
+		
 	}
 
 	@Override
