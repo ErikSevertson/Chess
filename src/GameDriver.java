@@ -31,11 +31,11 @@ public class GameDriver extends JPanel implements MouseListener {
 	}
 
 	public static void init_board(String playerOrComputer) {
-		gameType = playerOrComputer;
-		if (gameType == "computer") {
-			bot = new BotLogic("computer");
-		}
 		board = new GameDriver();
+		gameType = playerOrComputer;
+		if (gameType == "Computer") {
+			bot = new BotLogic("Computer");
+		}
 		JFrame frame = new JFrame();
 		frame.add(board);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
