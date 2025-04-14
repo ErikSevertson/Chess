@@ -24,12 +24,17 @@ public class GameDriver extends JPanel implements MouseListener {
 
 	private static boolean isPlayerTurn = true;
 
+	private static BotLogic bot;
+
 	public static void main(String[] args) {
 		init_board("TwoPlayer");
 	}
 
 	public static void init_board(String playerOrComputer) {
 		gameType = playerOrComputer;
+		if (gameType == "computer") {
+			bot = new BotLogic("computer");
+		}
 		board = new GameDriver();
 		JFrame frame = new JFrame();
 		frame.add(board);
@@ -145,7 +150,7 @@ public class GameDriver extends JPanel implements MouseListener {
 				if (Board.isPieceInHand) {
 					Board.placePiece();
 					isPlayerTurn = false;
-					// make computer move here !!!!!!
+					bot.makeMove();
 				} else {
 					Board.pickPieceUp();
 				}
